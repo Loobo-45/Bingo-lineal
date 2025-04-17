@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bingo lineal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      font-family: 'Fredoka', sans-serif;
+      background-color: #f5f7fa;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-evenly;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: #333;
+      margin: 0;
+    }
+
+    canvas {
+      border-radius: 12px;
+      border: 3px solid #444;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      background-color: #fff;
+      width: 90vw;
+      max-width: 500px;
+      font-family: 'Fredoka', sans-serif;
+      aspect-ratio: 1 / 1;
+    }
+
+    .botones {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    button {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #43cea2, #185a9d);
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>ɤɸ Bingo lineal ɸɤ</h1>
+  <canvas id="bingoCanvas"></canvas>
+  <div class="botones">
+    <button onclick="generarBingo()">🎲 Generar Bingo 🎲</button>
+    <button onclick="descargarBingo()">⬇️ Descargar Imagen ⬇️</button>
+  </div>
+
+  <script>
+    const frases = [
+      "Seba lustra la panza cervecera",
+      "Esto se desarrolla/ve mejor en álgebra x",
+      "Spanglish",
+      "Analogía rara e innecesariamente larga",
+      "Lo que sigue es lo más importante",
+      "Spoiler",
+      "La clase empieza realmente a las 17:30",
+      "Bueno esto no lo voy a explicar *lo explica*",
+      "*ruido de mate*",
+      "Alguien saca tiktok/reels y se escucha",
+      "Esto no es importante pero...",
+      "La teorica dura 10+ minutos de más",
+      "Seba hace referencia a algún vicio",
+      "", "", "", "", "", "", "", "", "", "", "", ""
+    ];
+
+    const canvas = document.getElementById("bingoCanvas");
+    const ctx = canvas.getContext("2d");
+    const size = 5;
+
+    const color1 = "#fff9c4"; // amarillo claro
+    const color2 = "#ffe082"; // amarillo más oscuro
+    const colorCentro = "#ffd54f"; // para la celda central
+
+    function shuffle(array) {
+      let currentIndex = array.length, randomIndex;
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [
+          array[randomIndex], array[currentIndex]];
+      }
+      return array;
+    }
+
+    function generarBingo() {
+      const dimension = canvas.clientWidth;
+      canvas.width = dimension;
+      canvas.height = dimension;
+
+      const cellSize = dimension / size;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = "#333";
+      ctx.lineWidth = 3;
+      ctx.textAlign = "center";
+      ctx.font = "14px 'Quicksand', sans-serif";
+      ctx.textBaseline = "middle";
+
+      const frasesRandom = shuffle(frases.slice()).slice(0, 24);
+      let fraseIndex = 0;
+
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          const x = col * cellSize;
+          const y = row * cellSize;
+
+          let fondo;
+          if (row === 2 && col === 2) {
+            fondo = colorCentro;
+          } else {
+            fondo = (row + col) % 2 === 0 ? color1 : color2;
+          }
+
+          ctx.fillStyle = fondo;
+          ctx.fillRect(x, y, cellSize, cellSize);
+          ctx.strokeRect(x, y, cellSize, cellSize);
+
+          let texto = (row === 2 && col === 2) ? "🎈BINGO🎈" : frasesRandom[fraseIndex++];
+
+          const palabras = texto.split(" ");
+          let linea = "";
+          let lineas = [];
+
+          ctx.font = `${Math.floor(cellSize / 10)}px 'Fredoka', sans-serif`; // Fuente base
+
+          for (let palabra of palabras) {
+            const testLinea = linea + palabra + " ";
+            if (ctx.measureText(testLinea).width > cellSize - 10) {
+              lineas.push(linea);
+              linea = palabra + " ";
+            } else {
+              linea = testLinea;
+            }
+          }
+          lineas.push(linea);
+
+          ctx.fillStyle = "#222";
+          ctx.font = (row === 2 && col === 2)
+            ? `bold ${Math.floor(cellSize / 8)}px 'Fredoka', sans-serif`
+            : `${Math.floor(cellSize / 10)}px 'Fredoka', sans-serif`;
+
+          for (let i = 0; i < lineas.length; i++) {
+            ctx.fillText(
+              lineas[i].trim(),
+              x + cellSize / 2,
+              y + (cellSize / 2) + (i - lineas.length / 2 + 0.5) * (cellSize / 6)
+            );
+          }
+        }
+      }
+    }
+
+    function descargarBingo() {
+      const enlace = document.createElement("a");
+      enlace.download = "bingo_lineal.jpg";
+      enlace.href = canvas.toDataURL("image/jpeg");
+      enlace.click();
+    }
+
+    window.addEventListener("resize", generarBingo);
+    generarBingo();
+  </script>
+
+</body>
+</html>
