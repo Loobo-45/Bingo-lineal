@@ -13,3 +13,7 @@ Este proyecto es una versión interactiva de un **Bingo Lineal**. Está diseñad
 1. Abre el proyecto en tu navegador.
 2. Haz clic en **"Generar Bingo"** para crear un nuevo cartón.
 3. Haz clic en **"Descargar Imagen"** para guardar el bingo como archivo de imagen.
+
+## Link
+
+https://loobo-45.github.io/Bingo-lineal/
