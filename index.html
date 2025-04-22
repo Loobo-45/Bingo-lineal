@@ -85,7 +85,7 @@
       "Analogía rara e innecesariamente larga",
       "Lo que sigue es lo más importante",
       "Spoiler",
-      "La clase empieza realmente a las 17:30",
+      "La clase empieza realmente despues de 17:15",
       "Bueno esto no lo voy a explicar *lo explica*",
       "*ruido de mate*",
       "Alguien saca tiktok/reels y se escucha",
@@ -103,40 +103,45 @@
       "golpean al pobre pizarron",
       "hipolito habla de su investigacion",
       "toma lista en voz alta",
-      "seba tira la mala"
+      "seba tira la mala",
+      "referencia literaria"
     ];
 
     const canvas = document.getElementById("bingoCanvas");
     const ctx = canvas.getContext("2d");
     const size = 5;
 
-    const color1 = "#fff9c4"; // amarillo claro
-    const color2 = "#ffe082"; // amarillo más oscuro
-    const colorCentro = "#ffd54f"; // para la celda central
+    const color1 = "#fff9c4";
+    const color2 = "#ffe082";
+    const colorCentro = "#ffd54f";
 
     function shuffle(array) {
       let currentIndex = array.length, randomIndex;
       while (currentIndex !== 0) {
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex--;
-        [array[currentIndex], array[randomIndex]] = [
-          array[randomIndex], array[currentIndex]];
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
       }
       return array;
     }
 
     function generarBingo() {
       const dimension = canvas.clientWidth;
-      canvas.width = dimension;
-      canvas.height = dimension;
+      const scale = window.devicePixelRatio || 1;
+
+      canvas.width = dimension * scale;
+      canvas.height = dimension * scale;
+      canvas.style.width = `${dimension}px`;
+      canvas.style.height = `${dimension}px`;
+
+      ctx.setTransform(scale, 0, 0, scale, 0, 0);
 
       const cellSize = dimension / size;
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, dimension, dimension);
       ctx.strokeStyle = "#333";
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 3 / scale;
       ctx.textAlign = "center";
-      ctx.font = "14px 'Quicksand', sans-serif";
       ctx.textBaseline = "middle";
 
       const frasesRandom = shuffle(frases.slice()).slice(0, 24);
@@ -164,7 +169,7 @@
           let linea = "";
           let lineas = [];
 
-          ctx.font = `${Math.floor(cellSize / 10)}px 'Fredoka', sans-serif`; // Fuente base
+          ctx.font = `${Math.floor(cellSize / 10)}px 'Fredoka', sans-serif`;
 
           for (let palabra of palabras) {
             const testLinea = linea + palabra + " ";
